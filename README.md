@@ -3,4 +3,6 @@
 
 # TODO:
 - [x] initial styling of homepage
-- [ ] make the form work
+- [x] create schema and configure db
+- [ ] create add url query
+- [ ] make the form add an url
