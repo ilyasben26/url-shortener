@@ -4,6 +4,7 @@
 import { sql } from "drizzle-orm";
 import {
   index,
+  integer,
   pgTableCreator,
   serial,
   timestamp,
@@ -23,7 +24,8 @@ export const urls = createTable(
   {
     id: serial("id").primaryKey(),
     originalUrl: varchar("original_url", { length: 1024 }).notNull(),
-    shortCode: varchar("short_code", { length: 256 }).notNull(),
+    shortCode: varchar("short_code", { length: 256 }).notNull().unique(),
+    visits: integer("visits").default(0).notNull(),
     createdAt: timestamp("created_at", { withTimezone: true })
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),
