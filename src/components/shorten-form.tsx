@@ -3,17 +3,55 @@
 import React, { useState } from 'react'
 import { Input } from './ui/input'
 import { Button } from './ui/button'
-
-
-//TODO: Use another form technique
+import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 
 export default function ShortenForm() {
 
     const [url, setUrl] = useState<string>();
+    const router = useRouter();
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        console.log(url);
+
+        // Client-side validation
+        if (!url) {
+            toast.error('URL is required.')
+            return;
+        } else {
+            try {
+                new URL(url);
+            } catch {
+                toast.error('Invalid URL.')
+                return;
+            }
+        }
+
+        // Server-side validation
+        try {
+
+            toast('Shortening URL ...')
+            const response = await fetch('/api/shorten', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ url }),
+            });
+
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+            const responseData = await response.json();
+
+            if (!response.ok) {
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
+                throw new Error(responseData.message || 'Failed to shorten URL');
+            }
+
+            setUrl('');
+            router.refresh();
+            toast.success('URL successfully shortened')
+        } catch (error) {
+            toast.error(error instanceof Error ? error.message : 'Something went wrong');
+
+        }
     }
 
     return (
@@ -24,13 +62,12 @@ export default function ShortenForm() {
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
                     onChange={(e) => setUrl(e.target.value)}
                     className='h-12'
-                    type='url'
                     placeholder='Enter URL to shorten'
-                    required
                 />
                 <Button
                     className='w-full p-2'
-                    type='submit'>
+                    type='submit'
+                >
                     Shorten URL
                 </Button>
             </div>
