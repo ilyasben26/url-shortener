@@ -2,6 +2,8 @@ import { redirect } from 'next/navigation';
 import React from 'react'
 import { getURLfromCode, logAccess } from '~/server/queries';
 
+// TODO: implement rate limiting
+
 interface RedirectPageProps {
     params: { shortcode: string }
 }
