@@ -1,5 +1,4 @@
-import { redirect } from 'next/navigation';
-import React from 'react'
+import { notFound, redirect } from 'next/navigation';
 import { getURLfromCode, logAccess } from '~/server/queries';
 
 // TODO: implement rate limiting
@@ -15,7 +14,7 @@ export default async function RedirectPage({ params }: RedirectPageProps) {
     const url = await getURLfromCode(shortcode);
 
     if (!url) {
-        return <div>404 - URL not found</div>
+        notFound();
     }
 
     // track access to the shortened link

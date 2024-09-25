@@ -1,12 +1,21 @@
-import Link from 'next/link'
-import { EyeIcon } from 'lucide-react'
+import Link from 'next/link';
+import { EyeIcon } from 'lucide-react';
 import { getMyUrls } from '~/server/queries';
 import CopyButton from './copy-button';
+import { toast } from 'sonner';
 
 export const dynamic = "force-dynamic";
 
 export default async function UrlList() {
-    const urls = await getMyUrls();
+    let urls = [];
+
+    try {
+        urls = await getMyUrls();
+    } catch (error) {
+        console.error('Error loading URLs:', error);
+        //toast.error('Failed to load URLs. Please try again later.');
+        return <p className='text-red-500 text-center'>Error loading URLs. Please try again later.</p>;
+    }
 
     const formatShortenedUrl = (code: string) =>
         `${process.env.NEXT_PUBLIC_BASE_URL}/${code}`;
@@ -31,5 +40,5 @@ export default async function UrlList() {
                 ))}
             </ul>
         </div>
-    )
+    );
 }
