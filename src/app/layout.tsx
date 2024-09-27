@@ -4,6 +4,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { GeistSans } from "geist/font/sans";
 import { type Metadata } from "next";
 import { Toaster } from "sonner";
+import Navbar from "~/components/navbar";
 
 export const metadata: Metadata = {
   title: "URL Shortener",
@@ -17,7 +18,10 @@ export default function RootLayout({
   return (
     <ClerkProvider >
       <html lang="en" className={`${GeistSans.variable}`}>
-        <body>{children}</body>
+        <body>
+          <Navbar />
+          {children}
+        </body>
         <Toaster position="top-left" richColors />
       </html>
     </ClerkProvider>
