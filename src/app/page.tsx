@@ -9,9 +9,10 @@ export default function HomePage() {
         <h1 className="text-3xl md:text-4xl font-bold">URL Shortener</h1>
         <p className="md:text-lg">Shorten your URLs and share them easily</p>
       </div>
+
       <UrlShortenerContainer />
       <SignedOut>
-        <p>Please log in to shorten links</p>
+        <p className="text-center">Please sign up or sign in to shorten links</p>
       </SignedOut>
     </main>
   );

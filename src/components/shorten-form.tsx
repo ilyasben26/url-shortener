@@ -5,14 +5,29 @@ import { Input } from './ui/input'
 import { Button } from './ui/button'
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
+import { useUser } from '@clerk/nextjs';
 
 export default function ShortenForm() {
 
-    const [url, setUrl] = useState<string>();
+    const [url, setUrl] = useState<string>('');
     const router = useRouter();
+    const { isSignedIn } = useUser();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        try {
+            // Check if the user is signed in
+            if (!isSignedIn) {
+
+                toast.info('Please sign in or sign up to shorten URLs.');
+                return;
+            }
+
+        } catch {
+            toast.error('Something went wrong');
+        }
+
 
         // Client-side validation
         if (!url) {
@@ -29,6 +44,8 @@ export default function ShortenForm() {
 
         // Server-side validation
         try {
+
+
 
             toast('Shortening URL ...')
             const response = await fetch('/api/shorten', {

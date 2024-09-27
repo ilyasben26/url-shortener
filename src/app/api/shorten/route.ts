@@ -3,6 +3,7 @@ import { db } from "~/server/db";
 import { urls } from "~/server/db/schema";
 import { nanoid } from "nanoid";
 import { z } from "zod";
+import { auth } from "@clerk/nextjs/server";
 
 const urlSchema = z.object({
     url: z.string()
@@ -12,6 +13,10 @@ const urlSchema = z.object({
 
 export async function POST(request: NextRequest) {
     try {
+        const { userId }: { userId: string | null } = auth()
+
+        if (!userId) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const requestBody = await request.json();
         const parsedBody = urlSchema.parse(requestBody); // Validate the request body
@@ -23,6 +28,7 @@ export async function POST(request: NextRequest) {
         await db.insert(urls).values({
             originalUrl: url,
             shortCode: shortCode,
+            userId: userId,
             updatedAt: null,
         });
 
