@@ -2,7 +2,6 @@ import Link from 'next/link';
 import { EyeIcon } from 'lucide-react';
 import { getMyUrls } from '~/server/queries';
 import CopyButton from './copy-button';
-import { toast } from 'sonner';
 
 export const dynamic = "force-dynamic";
 
