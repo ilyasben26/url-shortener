@@ -1,3 +1,4 @@
+import { SignedIn, SignedOut } from "@clerk/nextjs";
 import Link from "next/link";
 import UrlShortenerContainer from "~/components/url-shortener-container";
 
@@ -9,6 +10,9 @@ export default function HomePage() {
         <p className="md:text-lg">Shorten your URLs and share them easily</p>
       </div>
       <UrlShortenerContainer />
+      <SignedOut>
+        <p>Please log in to shorten links</p>
+      </SignedOut>
     </main>
   );
 }
