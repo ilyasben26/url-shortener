@@ -12,7 +12,6 @@ export default async function UrlList() {
         urls = await getMyUrls();
     } catch (error) {
         console.error('Error loading URLs:', error);
-        //toast.error('Failed to load URLs. Please try again later.');
         return <p className='text-red-500 text-center'>Error loading URLs. Please try again later.</p>;
     }
 

@@ -1,18 +1,20 @@
+'use server';
+
 import { notFound } from "next/navigation";
 import { db } from "./db";
 import { urls } from "./db/schema";
 import { eq, sql } from "drizzle-orm";
 import { auth } from "@clerk/nextjs/server";
 
-// TODO: implement error handling
-
 export async function getMyUrls() {
+
     try {
         const user = auth();
         if (!user.userId) throw new Error("Unauthorized");
         const myurls = await db.select()
             .from(urls)
             .where(eq(urls.userId, user.userId));
+
         return myurls;
 
     } catch (error) {
