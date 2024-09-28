@@ -2,7 +2,7 @@
 
 import { notFound } from "next/navigation";
 import { db } from "./db";
-import { urls } from "./db/schema";
+import { urlAccessLogs, urls } from "./db/schema";
 import { eq, sql } from "drizzle-orm";
 import { auth } from "@clerk/nextjs/server";
 
@@ -46,8 +46,22 @@ export async function getURLfromCode(code: string) {
     }
 }
 
-export async function logAccess(code: string) {
+interface LogAccessHeaders {
+    userAgent: string;
+    ipAddress: string;
+    referer: string;
+}
+
+export async function logAccess(code: string, headers: LogAccessHeaders) {
     try {
+        // Find the corresponding URL
+        const url = await db.select().from(urls).where(eq(urls.shortCode, code)).limit(1);
+
+        if (!url || url.length === 0) {
+            console.error('Short URL not found');
+            return;
+        }
+
         // Increment the visits count by 1
         await db.update(urls)
             .set({
@@ -55,9 +69,29 @@ export async function logAccess(code: string) {
             })
             .where(eq(urls.shortCode, code));
 
-        // TODO: Grab visitor info like IP, device type, and other metrics and put them in log table
+        // Extract visitor info
+        const userAgent = headers.userAgent;
+        const ipAddress = headers.ipAddress;
+        const referer = headers.referer;
+
+        // You might also need to use an IP-to-location service for country, city, and region
+        const country = 'Unknown';  // Replace with actual geolocation logic
+        const city = 'Unknown';  // Replace with actual geolocation logic
+        const region = 'Unknown';  // Replace with actual geolocation logic
+
+        // Insert access log into url_access_logs
+        await db.insert(urlAccessLogs).values({
+            urlId: url[0]!.id,
+            userAgent: userAgent,
+            ipAddress: ipAddress,
+            referrer: referer,
+            country: country,
+            city: city,
+            region: region,
+        });
+
     } catch (error) {
         console.error('Error logging access:', error);
-        // silent error
+        // Handle the error, possibly notify
     }
 }

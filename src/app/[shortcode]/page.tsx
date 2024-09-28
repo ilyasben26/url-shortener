@@ -1,3 +1,4 @@
+import { headers } from 'next/headers';
 import { notFound, redirect } from 'next/navigation';
 import { getURLfromCode, logAccess } from '~/server/queries';
 
@@ -18,7 +19,16 @@ export default async function RedirectPage({ params }: RedirectPageProps) {
     }
 
     // track access to the shortened link
-    await logAccess(shortcode);
+    const reqHeaders = headers();
+
+    const userAgent = reqHeaders.get('user-agent') ?? '';
+    const ipAddress = reqHeaders.get('x-forwarded-for') ?? '';
+    const referer = reqHeaders.get('referer') ?? '';
+    await logAccess(shortcode, {
+        userAgent,
+        ipAddress,
+        referer,
+    });
 
     redirect(url);
 }
