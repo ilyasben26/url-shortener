@@ -27,7 +27,7 @@ export default async function UrlList() {
                                 {url.originalUrl}
                             </Link>
                             <div className='flex items-center gap-3'>
-                                <CopyButton url={process.env.NEXT_PUBLIC_URL + '/' + url.shortCode} />
+                                <CopyButton url={"https://" + process.env.VERCEL_URL + '/' + url.shortCode} />
                                 <span className='flex items-center text-muted-foreground '>
                                     <EyeIcon className='h-4 w-4 mr-2' />
                                     {url.visits}
