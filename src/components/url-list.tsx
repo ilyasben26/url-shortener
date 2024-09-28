@@ -15,8 +15,6 @@ export default async function UrlList() {
         return <p className='text-red-500 text-center'>Error loading URLs. Please try again later.</p>;
     }
 
-    const formatShortenedUrl = (code: string) =>
-        process.env.VERCEL = 1 ? `/${code}` : `${process.env.VERCEL_URL}/${code}`;
 
     return (
         <div>
@@ -25,11 +23,11 @@ export default async function UrlList() {
                 <ul className='space-y-2'>
                     {urls.map((url) => (
                         <li key={url.id} className='flex items-center gap-2 justify-between'>
-                            <Link href={formatShortenedUrl(url.shortCode)} target='_blank' className='text-blue-500'>
+                            <Link href={url.shortCode} target='_blank' className='text-blue-500'>
                                 {url.originalUrl}
                             </Link>
                             <div className='flex items-center gap-3'>
-                                <CopyButton url={formatShortenedUrl(url.shortCode)} />
+                                <CopyButton url={process.env.NEXT_PUBLIC_URL + '/' + url.shortCode} />
                                 <span className='flex items-center text-muted-foreground '>
                                     <EyeIcon className='h-4 w-4 mr-2' />
                                     {url.visits}
