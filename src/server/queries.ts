@@ -8,10 +8,11 @@ import { auth } from "@clerk/nextjs/server";
 
 export async function getMyUrls() {
     try {
-        // Simulate user auth check if necessary
         const user = auth();
         if (!user.userId) throw new Error("Unauthorized");
-        const myurls = await db.query.urls.findMany();
+        const myurls = await db.select()
+            .from(urls)
+            .where(eq(urls.userId, user.userId));
         return myurls;
 
     } catch (error) {

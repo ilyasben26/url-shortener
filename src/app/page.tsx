@@ -12,7 +12,7 @@ export default function HomePage() {
 
       <UrlShortenerContainer />
       <SignedOut>
-        <p className="text-center">Please sign up or sign in to shorten links</p>
+        <p className="text-center">Please sign up or sign in to shorten URLs</p>
       </SignedOut>
     </main>
   );

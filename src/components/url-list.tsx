@@ -21,23 +21,27 @@ export default async function UrlList() {
 
     return (
         <div>
-            <h2 className='text-2xl font-bold mb-2'>Recent URLs</h2>
-            <ul className='space-y-2'>
-                {urls.map((url) => (
-                    <li key={url.id} className='flex items-center gap-2 justify-between'>
-                        <Link href={formatShortenedUrl(url.shortCode)} target='_blank' className='text-blue-500'>
-                            {url.originalUrl}
-                        </Link>
-                        <div className='flex items-center gap-3'>
-                            <CopyButton url={formatShortenedUrl(url.shortCode)} />
-                            <span className='flex items-center text-muted-foreground '>
-                                <EyeIcon className='h-4 w-4 mr-2' />
-                                {url.visits}
-                            </span>
-                        </div>
-                    </li>
-                ))}
-            </ul>
+            {urls.length > 0 && <div>
+                <h2 className='text-2xl font-bold mb-2'>Recent URLs</h2>
+                <ul className='space-y-2'>
+                    {urls.map((url) => (
+                        <li key={url.id} className='flex items-center gap-2 justify-between'>
+                            <Link href={formatShortenedUrl(url.shortCode)} target='_blank' className='text-blue-500'>
+                                {url.originalUrl}
+                            </Link>
+                            <div className='flex items-center gap-3'>
+                                <CopyButton url={formatShortenedUrl(url.shortCode)} />
+                                <span className='flex items-center text-muted-foreground '>
+                                    <EyeIcon className='h-4 w-4 mr-2' />
+                                    {url.visits}
+                                </span>
+                            </div>
+                        </li>
+                    ))}
+                </ul>
+            </div>}
+            {urls.length === 0 && <p className='text-center'>You do not have any shortened URLs yet.</p>}
+
         </div>
     );
 }
