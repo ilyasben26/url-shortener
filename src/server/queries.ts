@@ -46,6 +46,42 @@ export async function getURLfromCode(code: string) {
     }
 }
 
+
+export async function getGeolocation(ipAddress: string) {
+    try {
+        const token = process.env.IP_INFO_TOKEN;
+        if (!token) {
+            throw new Error('IPInfo API token is missing. Set it in your environment variables.');
+        }
+
+        const response = await fetch(`https://ipinfo.io/${ipAddress}?token=${token}`);
+
+        if (!response.ok) {
+            throw new Error(`Error fetching data: ${response.statusText}`);
+        }
+
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        const data = await response.json();
+
+        return {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+            country: data.country || 'Unknown',
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+            city: data.city || 'Unknown',
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+            region: data.region || 'Unknown'
+        };
+    } catch (error) {
+        console.error('Error fetching geolocation data:', error);
+        return {
+            country: 'Unknown',
+            city: 'Unknown',
+            region: 'Unknown'
+        };
+    }
+}
+
+
 interface LogAccessHeaders {
     userAgent: string;
     ipAddress: string;
@@ -74,10 +110,32 @@ export async function logAccess(code: string, headers: LogAccessHeaders) {
         const ipAddress = headers.ipAddress;
         const referer = headers.referer;
 
-        // You might also need to use an IP-to-location service for country, city, and region
-        const country = 'Unknown';  // Replace with actual geolocation logic
-        const city = 'Unknown';  // Replace with actual geolocation logic
-        const region = 'Unknown';  // Replace with actual geolocation logic
+        const existingLog = await db.select()
+            .from(urlAccessLogs)
+            .where(eq(urlAccessLogs.ipAddress, ipAddress))
+            .limit(1);
+
+        let country = null;
+        let city = null;
+        let region = null;
+
+        if (existingLog.length > 0) {
+            // TODO: If yes, use the country, city, and region from there
+            country = existingLog[0]!.country;
+            city = existingLog[0]!.city;
+            region = existingLog[0]!.region;
+        } else {
+            const geoInfo = await getGeolocation(ipAddress);
+            if (geoInfo) {
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                country = geoInfo.country;
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                city = geoInfo.city;
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                region = geoInfo.region;
+            }
+        }
+
 
         // Insert access log into url_access_logs
         await db.insert(urlAccessLogs).values({
@@ -85,8 +143,11 @@ export async function logAccess(code: string, headers: LogAccessHeaders) {
             userAgent: userAgent,
             ipAddress: ipAddress,
             referrer: referer,
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             country: country,
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             city: city,
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             region: region,
         });
 
@@ -95,3 +156,4 @@ export async function logAccess(code: string, headers: LogAccessHeaders) {
         // Handle the error, possibly notify
     }
 }
+

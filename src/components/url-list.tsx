@@ -20,7 +20,7 @@ export default async function UrlList() {
     return (
         <div>
             {urls.length > 0 && <div>
-                <h2 className='text-2xl font-bold mb-2'>Recent URLs</h2>
+                <h2 className='text-2xl font-bold mb-2'>My URLs</h2>
                 <ul className='space-y-2'>
                     {urls.map((url) => (
                         <li key={url.id} className='flex items-center gap-2 justify-between'>
