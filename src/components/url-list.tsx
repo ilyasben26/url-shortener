@@ -17,7 +17,7 @@ export default async function UrlList() {
     }
 
     const formatShortenedUrl = (code: string) =>
-        `${process.env.NEXT_PUBLIC_BASE_URL}/${code}`;
+        `${process.env.VERCEL_URL}/${code}`;
 
     return (
         <div>
