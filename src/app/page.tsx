@@ -1,5 +1,4 @@
-import { SignedIn, SignedOut } from "@clerk/nextjs";
-import Link from "next/link";
+import { SignedOut } from "@clerk/nextjs";
 import UrlShortenerContainer from "~/components/url-shortener-container";
 
 export default function HomePage() {
