@@ -15,7 +15,6 @@ export default async function AnalyticsPage({ params }: AnalyticsPageProps) {
 
     return (<div>
         <SignedIn>
-            <h1>Analytics for {shortcode}</h1>
             <Analytics shortcode={shortcode} />
         </SignedIn>
         <SignedOut>

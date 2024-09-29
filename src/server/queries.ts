@@ -212,7 +212,7 @@ export async function getAnalytics(code: string) {
             .select({ uniqueIPs: sql`COUNT(DISTINCT ip_address)` })
             .from(urlAccessLogs)
             .where(eq(urlAccessLogs.urlId, urlRecord[0].id));
-        const total_unique_visits = unique_visits[0]?.uniqueIPs || 0;
+        const total_unique_visits = unique_visits[0]?.uniqueIPs as number || 0;
 
         // fetch country visits
         const country_visits = await db
