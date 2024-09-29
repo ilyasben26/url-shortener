@@ -1,11 +1,11 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
-const isProtectedRoute = createRouteMatcher(["/dashboard(.*)", "/api(.*)"]);
+const isProtectedRoute = createRouteMatcher(["/api(.*)"]);
 
 export default clerkMiddleware((auth, request, event) => {
     // Check if the route is protected
     if (isProtectedRoute(request)) {
-        const { userId, sessionId } = auth();
+        const { sessionId } = auth();
 
         // If sessionId is not present, return a 401 Unauthorized response
         if (!sessionId) {

@@ -157,3 +157,105 @@ export async function logAccess(code: string, headers: LogAccessHeaders) {
     }
 }
 
+// TODO: create an analytics object
+/*
+    KPIs:
+    - Total visits (froms urls table)
+    - Total unique visits (count from url_access_logs via unique IPs)
+    
+    Graphs:
+    - Country map with counts for each country
+    - Country count into pie chart
+    - Devices pie chart
+
+    {  
+        "original_url":
+        "KPI": {
+            "total_visits":
+            "total_unique_visits":
+        }
+        "country_visits": {
+            "DE": 
+            "FR":
+            ...
+        }
+        "device_visits": {
+            "Mac": 
+            "IOS":
+            ...
+        }
+
+    }
+*/
+
+// 
+export async function getAnalytics(code: string) {
+    try {
+        // check if the code exists
+        const urlRecord = await db.select()
+            .from(urls)
+            .where(eq(urls.shortCode, code))
+            .limit(1);
+
+        if (urlRecord.length === 0) {
+            notFound();
+        }
+
+        // check if it belongs to the user
+        const user = auth();
+        if (!user.userId) throw new Error("Unauthorized");
+        if (urlRecord[0]?.userId != user.userId) notFound();
+
+        // fetch the total vists
+        const total_visits = urlRecord[0].visits;
+        const unique_visits = await db
+            .select({ uniqueIPs: sql`COUNT(DISTINCT ip_address)` })
+            .from(urlAccessLogs)
+            .where(eq(urlAccessLogs.urlId, urlRecord[0].id));
+        const total_unique_visits = unique_visits[0]?.uniqueIPs || 0;
+
+        // fetch country visits
+        const country_visits = await db
+            .select({ country: urlAccessLogs.country, count: sql`COUNT(*)` })
+            .from(urlAccessLogs)
+            .where(eq(urlAccessLogs.urlId, urlRecord[0].id))
+            .groupBy(urlAccessLogs.country);
+
+        const countryVisitMap: Record<string, number> = {};
+        country_visits.forEach((row: { country: string | null, count: unknown }) => {
+            const country = row.country ?? "Unknown";
+            const count = typeof row.count === "number" ? row.count : 0;
+            countryVisitMap[country] = count;
+        });
+
+        const device_visits = await db
+            .select({ userAgent: urlAccessLogs.userAgent })
+            .from(urlAccessLogs)
+            .where(eq(urlAccessLogs.urlId, urlRecord[0].id));
+
+
+        const deviceVisitMap: Record<string, number> = {};
+        device_visits.forEach((row: { userAgent: string | null }) => {
+            const userAgent = row.userAgent ?? "Unknown";
+            deviceVisitMap[userAgent] = (deviceVisitMap[userAgent] ?? 0) + 1;
+        });
+
+        const analytics = {
+            original_url: urlRecord[0].originalUrl,
+            KPI: {
+                total_visits,
+                total_unique_visits
+            },
+            country_visits: countryVisitMap,
+            device_visits: deviceVisitMap
+        };
+
+
+        return analytics;
+    } catch (error) {
+        console.error('Error fetching code', error);
+        // show a 404 Not found
+        notFound();
+    }
+
+}
