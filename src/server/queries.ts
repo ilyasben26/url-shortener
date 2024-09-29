@@ -216,7 +216,7 @@ export async function getAnalytics(code: string) {
 
         // fetch country visits
         const country_visits = await db
-            .select({ country: urlAccessLogs.country, count: sql`COUNT(*)` })
+            .select({ country: urlAccessLogs.country, count: sql`COUNT(*)::int` })
             .from(urlAccessLogs)
             .where(eq(urlAccessLogs.urlId, urlRecord[0].id))
             .groupBy(urlAccessLogs.country);
@@ -224,9 +224,10 @@ export async function getAnalytics(code: string) {
         const countryVisitMap: Record<string, number> = {};
         country_visits.forEach((row: { country: string | null, count: unknown }) => {
             const country = row.country ?? "Unknown";
-            const count = typeof row.count === "number" ? row.count : 0;
+            const count = row.count as number;
             countryVisitMap[country] = count;
         });
+
 
         const device_visits = await db
             .select({ userAgent: urlAccessLogs.userAgent })

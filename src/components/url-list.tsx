@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { EyeIcon, Settings } from 'lucide-react';
+import { EyeIcon, ChartPie } from 'lucide-react';
 import { getMyUrls } from '~/server/queries';
 import CopyButton from './copy-button';
 import { Button } from './ui/button';
@@ -33,13 +33,16 @@ export default async function UrlList() {
                                     <EyeIcon className='h-4 w-4 mr-2' />
                                     {url.visits}
                                 </span>
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className='text-muted-foreground hover:bg-muted'
-                                >
-                                    <Settings />
-                                </Button>
+                                <Link href={"/analytics/" + url.shortCode}>
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className='text-muted-foreground hover:bg-muted'
+                                    >
+                                        <ChartPie />
+                                    </Button>
+                                </Link>
+
                             </div>
                         </li>
                     ))}
