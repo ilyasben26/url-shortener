@@ -3,7 +3,7 @@
 import { notFound, redirect } from "next/navigation";
 import { db } from "./db";
 import { urlAccessLogs, urls } from "./db/schema";
-import { eq, sql } from "drizzle-orm";
+import { eq, sql, desc } from "drizzle-orm";
 import { auth } from "@clerk/nextjs/server";
 
 export async function getMyUrls() {
@@ -24,11 +24,9 @@ export async function getMyUrls() {
     }
 }
 
-export async function deleteURL(formData: FormData) {
-
-    const code = formData.get('shortcode') as string;
-
+export async function getRecentAccessLogs(code: string) {
     try {
+        // the necessary checks
         // check if the code exists
         const urlRecord = await db.select()
             .from(urls)
@@ -44,11 +42,62 @@ export async function deleteURL(formData: FormData) {
         if (!user.userId) throw new Error("Unauthorized");
         if (urlRecord[0]?.userId != user.userId) throw new Error("Unauthorized");
 
+
+        // only fetch accessed_at, user_agent, referrer, ip_address, country, city, region
+        // and only take recent entries and limit to 100
+        const accessLogs = await db.select({
+            accessedAt: urlAccessLogs.accessedAt,
+            userAgent: urlAccessLogs.userAgent,
+            referrer: urlAccessLogs.referrer,
+            ipAddress: urlAccessLogs.ipAddress,
+            country: urlAccessLogs.country,
+            city: urlAccessLogs.city,
+            region: urlAccessLogs.region,
+        })
+            .from(urlAccessLogs)
+            .where(eq(urlAccessLogs.urlId, urlRecord[0].id))
+            .orderBy(desc(urlAccessLogs.accessedAt))
+            .limit(100);
+
+        return accessLogs;
+
+    } catch {
+        throw new Error("Error while fetching access logs. Please try again later.")
+    }
+}
+
+const preview_code = "X9gTbDQQ"
+
+export async function deleteURL(formData: FormData) {
+
+    const code = formData.get('shortcode') as string;
+
+    try {
+        // check if the code exists
+        const urlRecord = await db.select()
+            .from(urls)
+            .where(eq(urls.shortCode, code))
+            .limit(1);
+
+        if (urlRecord.length === 0) {
+            throw new Error("Not existing")
+        }
+
+        // to not delete the preview dashboard
+        if (urlRecord[0]?.shortCode == preview_code) {
+            throw new Error("Cannot Delete preview url")
+        }
+
+        // check if it belongs to the user
+        const user = auth();
+        if (!user.userId) throw new Error("Unauthorized");
+        if (urlRecord[0]?.userId != user.userId) throw new Error("Unauthorized");
+
         // delete the logs for the record in url_access_logs, then delete the record in urls
-        await db.delete(urlAccessLogs)
-            .where(eq(urlAccessLogs.urlId, urlRecord[0].id));
-        await db.delete(urls)
-            .where(eq(urls.shortCode, code));
+        //await db.delete(urlAccessLogs)
+        //    .where(eq(urlAccessLogs.urlId, urlRecord[0].id));
+        //await db.delete(urls)
+        //    .where(eq(urls.shortCode, code));
 
         redirect('/')
 

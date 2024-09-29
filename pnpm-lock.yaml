@@ -26,6 +26,9 @@ importers:
       '@t3-oss/env-nextjs':
         specifier: ^0.10.1
         version: 0.10.1(typescript@5.6.2)(zod@3.23.8)
+      '@tanstack/react-table':
+        specifier: ^8.20.5
+        version: 8.20.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@vercel/postgres':
         specifier: ^0.10.0
         version: 0.10.0
@@ -818,6 +821,17 @@ packages:
     peerDependenciesMeta:
       typescript:
         optional: true
+
+  '@tanstack/react-table@8.20.5':
+    resolution: {integrity: sha512-WEHopKw3znbUZ61s9i0+i9g8drmDo6asTWbrQh8Us63DAk/M0FkmIqERew6P71HI75ksZ2Pxyuf4vvKh9rAkiA==}
+    engines: {node: '>=12'}
+    peerDependencies:
+      react: '>=16.8'
+      react-dom: '>=16.8'
+
+  '@tanstack/table-core@8.20.5':
+    resolution: {integrity: sha512-P9dF7XbibHph2PFRz8gfBKEXEY/HJPOhym8CHmjF8y3q5mWpKx9xtZapXQUWCgkqvsK0R46Azuz+VaxD4Xl+Tg==}
+    engines: {node: '>=12'}
 
   '@types/eslint@8.56.12':
     resolution: {integrity: sha512-03ruubjWyOHlmljCVoxSuNDdmfZDzsrrz0P2LeJsOXr+ZwFQ+0yQIwNCwt/GYhV7Z31fgtXJTAEs+FYlEL851g==}
@@ -3197,6 +3211,14 @@ snapshots:
       zod: 3.23.8
     optionalDependencies:
       typescript: 5.6.2
+
+  '@tanstack/react-table@8.20.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+    dependencies:
+      '@tanstack/table-core': 8.20.5
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+
+  '@tanstack/table-core@8.20.5': {}
 
   '@types/eslint@8.56.12':
     dependencies:

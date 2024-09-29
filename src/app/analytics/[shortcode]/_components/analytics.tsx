@@ -7,6 +7,7 @@ import { Button } from "~/components/ui/button";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "~/components/ui/dialog";
+import LogTable from "./log-table";
 
 
 interface AnalyticsProps {
@@ -93,6 +94,14 @@ export default async function Analytics({ shortcode }: AnalyticsProps) {
                 </Card>
             </div>
 
+            <Card className="mb-6">
+                <CardHeader>
+                    <CardTitle className="text-xl">Recent Access</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <LogTable shortcode={shortcode}></LogTable>
+                </CardContent>
+            </Card>
 
             {/* KPI Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
