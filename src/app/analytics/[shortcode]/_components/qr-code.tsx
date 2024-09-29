@@ -32,7 +32,6 @@ export function QrCode({ shortened_url }: QrCodeProps) {
         }
     };
 
-    // Generate the QR code on component mount or when the shortened_url changes
     useEffect(() => {
         generate();
     }, [generate, shortened_url]);

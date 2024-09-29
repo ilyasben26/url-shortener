@@ -1,5 +1,3 @@
-// TODO: make it check if short code actually belongs to user, else redirect to main page
-
 import { RedirectToSignIn, SignedIn, SignedOut } from "@clerk/nextjs";
 import Analytics from "./_components/analytics";
 

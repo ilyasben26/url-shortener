@@ -1,6 +1,6 @@
 'use server';
 
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { db } from "./db";
 import { urlAccessLogs, urls } from "./db/schema";
 import { eq, sql } from "drizzle-orm";
@@ -19,10 +19,42 @@ export async function getMyUrls() {
 
     } catch (error) {
         console.error('Error fetching URLs:', error);
-        // Log error to monitoring service (like Sentry) if needed
-        // Sentry.captureException(error);
 
         throw new Error('Failed to fetch URLs. Please try again later.');
+    }
+}
+
+export async function deleteURL(formData: FormData) {
+
+    const code = formData.get('shortcode') as string;
+
+    try {
+        // check if the code exists
+        const urlRecord = await db.select()
+            .from(urls)
+            .where(eq(urls.shortCode, code))
+            .limit(1);
+
+        if (urlRecord.length === 0) {
+            throw new Error("Not existing")
+        }
+
+        // check if it belongs to the user
+        const user = auth();
+        if (!user.userId) throw new Error("Unauthorized");
+        if (urlRecord[0]?.userId != user.userId) throw new Error("Unauthorized");
+
+        // delete the logs for the record in url_access_logs, then delete the record in urls
+        await db.delete(urlAccessLogs)
+            .where(eq(urlAccessLogs.urlId, urlRecord[0].id));
+        await db.delete(urls)
+            .where(eq(urls.shortCode, code));
+
+        redirect('/')
+
+    } catch (error) {
+        console.error('Error deleting URL:', error);
+        redirect('/')
     }
 }
 
@@ -120,7 +152,6 @@ export async function logAccess(code: string, headers: LogAccessHeaders) {
         let region = null;
 
         if (existingLog.length > 0) {
-            // TODO: If yes, use the country, city, and region from there
             country = existingLog[0]!.country;
             city = existingLog[0]!.city;
             region = existingLog[0]!.region;
@@ -157,38 +188,6 @@ export async function logAccess(code: string, headers: LogAccessHeaders) {
     }
 }
 
-// TODO: create an analytics object
-/*
-    KPIs:
-    - Total visits (froms urls table)
-    - Total unique visits (count from url_access_logs via unique IPs)
-    
-    Graphs:
-    - Country map with counts for each country
-    - Country count into pie chart
-    - Devices pie chart
-
-    {  
-        "original_url":
-        "KPI": {
-            "total_visits":
-            "total_unique_visits":
-        }
-        "country_visits": {
-            "DE": 
-            "FR":
-            ...
-        }
-        "device_visits": {
-            "Mac": 
-            "IOS":
-            ...
-        }
-
-    }
-*/
-
-// 
 export async function getAnalytics(code: string) {
     try {
         // check if the code exists

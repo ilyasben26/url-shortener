@@ -42,9 +42,6 @@ export default function ShortenForm() {
             }
         }
 
-        // TODO: look at Clerk user public metadata maximum_urls and compare it with the cookie urls_count
-        // If urls_count is bigger than or equal to maximum_urls, show a toast that says `You are only allowed to have ${Number(maximumUrls)} shortened URLs, delete some to create new ones.` and then return
-
         // Server-side validation
         try {
 
