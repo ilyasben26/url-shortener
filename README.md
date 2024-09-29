@@ -12,6 +12,7 @@ A simple URL shortener that allows you to shorten URLs and track visitors on a d
 - PostgreSQL as a database
 - Shadcn-ui for UI components
 - Tailwind CSS for styling
+- create-t3-app for the initial project setup
 
 ## Features:
 - Trackable shortned URLs
