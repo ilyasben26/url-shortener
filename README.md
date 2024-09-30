@@ -1,6 +1,5 @@
 # URL Shortener
-## 🔴 live website: 
-[https://url-shortener-projekt.vercel.app](https://url-shortener-projekt.vercel.app)
+### 🔴 live website: [https://url-shortener-projekt.vercel.app](https://url-shortener-projekt.vercel.app)
 
 A simple URL shortener that allows you to shorten URLs and track visitors on a dashboard.
 
